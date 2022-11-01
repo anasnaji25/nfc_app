@@ -11,6 +11,8 @@ class HomeView extends StatefulWidget {
 class _HomeViewState extends State<HomeView> {
   String resultMessage = "Result Will show here";
 
+  ValueNotifier<dynamic> result = ValueNotifier(null);
+
   void _ndefWrite() {
     setState(() {
       resultMessage = 'Session Started';
@@ -51,6 +53,7 @@ class _HomeViewState extends State<HomeView> {
     });
     NfcManager.instance.startSession(onDiscovered: (NfcTag tag) async {
       setState(() {
+        result.value = tag.data;
         resultMessage =
             tag.data.entries.first.value + " " + tag.data.entries.last.value;
       });
@@ -74,24 +77,32 @@ class _HomeViewState extends State<HomeView> {
                   "session stopped , now use read or write with new session";
             });
           },
-          child: Icon(Icons.restart_alt,size: 30,color: Colors.green,)),
+          child: Icon(
+            Icons.restart_alt,
+            size: 30,
+            color: Colors.green,
+          )),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Padding(
-              padding: const EdgeInsets.only(left: 20,right: 20),
+              padding: const EdgeInsets.only(left: 20, right: 20),
               child: Center(
                 child: Container(
                   alignment: Alignment.center,
                   width: size.width,
                   child: Text(
                     resultMessage,
-                    style: TextStyle(fontSize: 16),
+                    style: const TextStyle(fontSize: 16),
                   ),
                 ),
               ),
+            ),
+            ValueListenableBuilder<dynamic>(
+              valueListenable: result,
+              builder: (context, value, _) => Text('${value ?? ''}'),
             ),
             const SizedBox(
               height: 50,
